@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\pelma\\MVS19\\StrCalc\\StrCalc\\StrCalc.csproj": {}
+    "D:\\Users\\pelma\\Documents\\GitHub\\CSLearn\\StrCalc\\StrCalc.csproj": {}
   },
   "projects": {
-    "C:\\Users\\pelma\\MVS19\\StrCalc\\StrCalc\\StrCalc.csproj": {
+    "D:\\Users\\pelma\\Documents\\GitHub\\CSLearn\\StrCalc\\StrCalc.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\pelma\\MVS19\\StrCalc\\StrCalc\\StrCalc.csproj",
+        "projectUniqueName": "D:\\Users\\pelma\\Documents\\GitHub\\CSLearn\\StrCalc\\StrCalc.csproj",
         "projectName": "StrCalc",
-        "projectPath": "C:\\Users\\pelma\\MVS19\\StrCalc\\StrCalc\\StrCalc.csproj",
+        "projectPath": "D:\\Users\\pelma\\Documents\\GitHub\\CSLearn\\StrCalc\\StrCalc.csproj",
         "packagesPath": "C:\\Users\\pelma\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\pelma\\MVS19\\StrCalc\\StrCalc\\obj\\",
+        "outputPath": "D:\\Users\\pelma\\Documents\\GitHub\\CSLearn\\StrCalc\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Microsoft\\Xamarin\\NuGet\\"

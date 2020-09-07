@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace StrCalc
@@ -21,15 +22,34 @@ namespace StrCalc
 
         public bool IsIncorrect()
         {
-            string pattern = "^([^\\*\\/]{0,1}[0-9]{1,})(([\\+\\-\\*\\/\\(\\)]{0,1}[0-9]){1,})$";   //победить скобка + знак
-            if (Regex.IsMatch(exp, pattern, RegexOptions.IgnoreCase))
+            if (IsIncorrectSymbols() || IsIncorrectBrackets() == true)
             {
-                Console.WriteLine("NORM");
-                return true;                                //дебаг
-                //return false;                             //правильно
+                Console.WriteLine("Incorrect input! Try again:");
+                return true;
             }
-            Console.WriteLine("Incorrect input! Try again:");
-            return true;
+            else return false;
+        }
+
+        public bool IsIncorrectSymbols()
+        {
+            string pattern = "^([^\\*\\/]{0,1}[\\(]{0,}[0-9]{1,})(([\\+\\-\\*\\/]{1,1}[\\(\\)]{0,1}[0-9][\\)]{0,}){1,})$";
+            if (Regex.IsMatch(exp, pattern, RegexOptions.IgnoreCase)) return false;
+            else return true;
+        }
+
+        public bool IsIncorrectBrackets()
+        {
+            sbyte countOpenBrack = 0;
+            sbyte countCloseBrack = 0;
+
+            foreach (char sym in exp)
+            {
+                if (sym == '(') countOpenBrack++;
+                if (sym == ')') countCloseBrack++;
+            }
+
+            if (countOpenBrack == countCloseBrack) return false;
+            else return true;
         }
     }
 
