@@ -9,6 +9,7 @@ namespace StrCalc
     {
         private string exp;
         List<string> listOfNums = new List<string>();
+        Stack<char> stack = new Stack<char>();
 
 
         public void GetExpression()
@@ -52,7 +53,7 @@ namespace StrCalc
             else return true;
         }
 
-        public void ProcessString()
+        public void ToReversePolishNotation()
         {
             string str = null;
             for (int i = 0; i < exp.Length; i++)
@@ -60,118 +61,57 @@ namespace StrCalc
                 if (Char.IsDigit(exp[i]))
                 {
                     str += exp[i];
-
+                }
+                else
+                {
+                    listOfNums.Add(str);
+                    str = null;
                 }
 
-                if (!Char.IsDigit(exp[i]))
+                if (exp[i] == '(')
                 {
-                    if (str != null)
+                    stack.Push(exp[i]);
+                }
+                else if (exp[i] == ')')
+                {
+                    while (stack.Peek() != '(')
                     {
-                        listOfNums.Add(str);
+                        listOfNums.Add(Convert.ToString(stack.Pop()));
                     }
 
-                    str = null;
-                    listOfNums.Add(Convert.ToString(exp[i]));
+                    stack.Pop();
                 }
+                else if (!Char.IsDigit(exp[i]))
+                {
+                    if (stack.Count > 0)
+                    {
+                        listOfNums.Add(Convert.ToString(stack.Pop()));
+                    }
+                    
+                    stack.Push(exp[i]);
+                }
+
+                // TODO: Исправить преобразование в ОПЗ выражений со скобками - Stack empty
+                // TODO: Исключить добавление в список '('
             }
 
             listOfNums.Add(str);
-        }
 
-        public void Calculate()
-        {
-            string value;
-
-            do
+            for (int i = 0; i < stack.Count; i++)
             {
-                int LastOpen = 0;
-                int FirstClose = 0;
+                listOfNums.Add(Convert.ToString(stack.Pop()));
+            }
 
-                for (int i = 0; i < listOfNums.Count; i++)
-                {
-                    if (listOfNums[i] == "(") LastOpen = i;
-                }
-
-                for (int i = 0; i < listOfNums.Count; i++)
-                {
-                    if (listOfNums[i] == ")")
-                    {
-                        FirstClose = i;
-                        break;
-                    }
-                }
-
-                value = Convert.ToString(ToCalculateBinary(LastOpen, FirstClose));
-                RemoveFromList(LastOpen, FirstClose);
-                listOfNums.Insert(LastOpen, value);
-                //ShowList();
-                if ((LastOpen == 0) && (FirstClose == 0)) break;
-
-            } while (true);
-
-            Console.Write("value: {0}", value);
+            ShowList();
         }
 
         public void ShowList()
         {
-            foreach (var el in listOfNums)
+            Console.WriteLine("Строка:");
+            foreach (var sym in listOfNums)
             {
-                Console.Write("{0} ", el);
+                Console.Write("{0} ", sym);
             }
-        }
-
-        public void RemoveFromList(int LastOpen, int FirstClose)
-        {
-            if ((LastOpen != 0) && (FirstClose != 0))
-            {
-                for (int i = FirstClose; i >= LastOpen; i--)
-                {
-                    listOfNums.RemoveAt(i);
-                }
-            }
-            
-        }
-
-        public int ToCalculateBinary(int bracketOpen, int bracketClose)
-        {
-            int result = 0;
-            if (listOfNums[bracketOpen + 2] == "+")
-            {
-                result = Convert.ToInt32(listOfNums[bracketOpen + 1]) + Convert.ToInt32(listOfNums[bracketClose - 1]);
-            }
-            else if (listOfNums[bracketOpen + 2] == "-")
-            {
-                result = Convert.ToInt32(listOfNums[bracketOpen + 1]) - Convert.ToInt32(listOfNums[bracketClose - 1]);
-            }
-            else if (listOfNums[bracketOpen + 2] == "*")
-            {
-                result = Convert.ToInt32(listOfNums[bracketOpen + 1]) * Convert.ToInt32(listOfNums[bracketClose - 1]);
-            }
-            else if (listOfNums[bracketOpen + 2] == "/")
-            {
-                result = Convert.ToInt32(listOfNums[bracketOpen + 1]) / Convert.ToInt32(listOfNums[bracketClose - 1]);
-            }
-            else
-            {
-                if (listOfNums[1] == "+")
-                {
-                    result = Convert.ToInt32(listOfNums[0]) + Convert.ToInt32(listOfNums[2]);
-                }
-                if (listOfNums[bracketOpen + 1] == "-")
-                {
-                    result = Convert.ToInt32(listOfNums[0]) - Convert.ToInt32(listOfNums[2]);
-                }
-                if (listOfNums[bracketOpen + 1] == "*")
-                {
-                    result = Convert.ToInt32(listOfNums[0]) * Convert.ToInt32(listOfNums[2]);
-                }
-                if (listOfNums[bracketOpen + 1] == "/")
-                {
-                    result = Convert.ToInt32(listOfNums[0]) / Convert.ToInt32(listOfNums[2]);
-                }
-            }
-
-            return result;
         }
     }
 
@@ -181,8 +121,8 @@ namespace StrCalc
         {
             Calculator obj = new Calculator();
             obj.GetExpression();
-            obj.ProcessString();
-            obj.Calculate();
+            obj.ToReversePolishNotation();
+            
         }
     }
 }
