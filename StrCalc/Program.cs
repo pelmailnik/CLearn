@@ -8,7 +8,7 @@ namespace StrCalc
     class Calculator
     {
         private string exp;
-        List<string> listOfNums = new List<string>();
+        List<string> outputList = new List<string>();
         Stack<char> stack = new Stack<char>();
 
 
@@ -56,62 +56,84 @@ namespace StrCalc
         public void ToReversePolishNotation()
         {
             string str = null;
+            int stackCount;
+
             for (int i = 0; i < exp.Length; i++)
             {
-                if (Char.IsDigit(exp[i]))
-                {
-                    str += exp[i];
-                }
-                else
-                {
-                    listOfNums.Add(str);
-                    str = null;
-                }
+                if (Char.IsDigit(exp[i])) str += exp[i];
+                else AddToOutputList(ref str);
 
-                if (exp[i] == '(')
-                {
-                    stack.Push(exp[i]);
-                }
+                if (exp[i] == '(') stack.Push(exp[i]);
                 else if (exp[i] == ')')
                 {
-                    while (stack.Peek() != '(')
-                    {
-                        listOfNums.Add(Convert.ToString(stack.Pop()));
-                    }
-
-                    stack.Pop();
+                    while (stack.Peek() != '(') outputList.Add(Convert.ToString(stack.Pop()));
+                    if (stack.Peek() == '(') stack.Pop();
                 }
                 else if (!Char.IsDigit(exp[i]))
                 {
-                    if (stack.Count > 0)
+                    if ((stack.Count > 0))
                     {
-                        listOfNums.Add(Convert.ToString(stack.Pop()));
+                        stackCount = stack.Count;
+                        for (int j = 0; j < stackCount; j++)
+                        {
+                            if (IsNoLowerPriority(stack.Peek(), exp[i]))
+                            {
+                                outputList.Add(Convert.ToString(stack.Pop()));
+                            }
+                        }
                     }
-                    
                     stack.Push(exp[i]);
                 }
-
-                // TODO: Исправить преобразование в ОПЗ выражений со скобками - Stack empty
-                // TODO: Исключить добавление в список '('
             }
 
-            listOfNums.Add(str);
+            AddToOutputList(ref str);
+            stackCount = stack.Count;
 
-            for (int i = 0; i < stack.Count; i++)
-            {
-                listOfNums.Add(Convert.ToString(stack.Pop()));
-            }
+            for (int i = 0; i < stackCount; i++) outputList.Add(Convert.ToString(stack.Pop()));
 
-            ShowList();
+            ShowOutputList();
         }
 
-        public void ShowList()
+        public bool IsNoLowerPriority(char fromStack, char fromString)
+        {
+            Dictionary<char, sbyte> priority = new Dictionary<char, sbyte>
+            {
+                {'+', 1},
+                {'-', 1},
+                {'*', 2},
+                {'/', 2}
+            };
+
+            if (fromStack != '(')
+            {
+                if (priority[fromStack] >= priority[fromString]) return true;
+                else return false;
+            }
+
+            return false;
+
+            //if (fromStack != '(')
+            //{
+            //    if ((fromStack == '+') && (fromString == '*')) return false;
+            //    else if ((fromStack == '*') && (fromString == '+')) return true;
+            //    else return true;
+            //}
+            //else return false;
+        }
+
+        public void AddToOutputList(ref string str)
+        {
+            if (str != null)
+            {
+                outputList.Add(str);
+                str = null;
+            }
+        }
+
+        public void ShowOutputList()
         {
             Console.WriteLine("Строка:");
-            foreach (var sym in listOfNums)
-            {
-                Console.Write("{0} ", sym);
-            }
+            foreach (var sym in outputList) Console.Write("{0} ", sym);
         }
     }
 
