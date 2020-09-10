@@ -1,28 +1,41 @@
 ﻿using System;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
-using System.Globalization;
 
 namespace StrCalc
 {
     class Calculator
     {
-        private string exp;
-        List<string> outputList = new List<string>();
-        Stack<char> stack = new Stack<char>();
+        private string expression;
+        List<string> outputList = new List<string>();   // Выходная строка для реализации алгоритма преобразования в ОПЗ
+        Stack<char> stack = new Stack<char>();          // Стэк для ОПЗ
 
-
-        public void GetExpression()
+        public Calculator(string expression)
         {
-            Console.WriteLine("Enter your expression:");
-            do
+            this.expression = DeleteSpases(expression);
+        }
+
+        private void GetExpression()
+        {
+            while (IsIncorrect()) expression = Console.ReadLine(); // Считывть строку, пока не будет соответствовать формату
+        }
+
+        private string DeleteSpases(string expression)
+        {
+            // Удаление пробелов в введенной строке
+
+            string str = null;
+            foreach (char sym in expression)
             {
-                exp = Console.ReadLine();
-            } while (IsIncorrect());
+                if (sym != ' ') str += Convert.ToString(sym);
+            }
+            return str;
         }
 
         private bool IsIncorrect()
         {
+            // Общая функция проверки
+
             if (IsIncorrectSymbols() || IsIncorrectBrackets())
             {
                 Console.WriteLine("Incorrect input! Try again:");
@@ -33,17 +46,21 @@ namespace StrCalc
 
         private bool IsIncorrectSymbols()
         {
+            // Функция проверки вводимых символов и их порядок
+
             string pattern = "^([^\\*\\/]{0,1}[\\(]{0,}[0-9]{1,})(([\\+\\-\\*\\/]{1,1}[\\(\\)]{0,1}[0-9]{1,}[\\)]{0,}){1,})$";
-            if (Regex.IsMatch(exp, pattern, RegexOptions.IgnoreCase)) return false;
+            if (Regex.IsMatch(expression, pattern, RegexOptions.IgnoreCase)) return false;
             else return true;
         }
 
         private bool IsIncorrectBrackets()
         {
+            // Функция проверки вводимых скобок
+
             sbyte countOpenBrack = 0;
             sbyte countCloseBrack = 0;
 
-            foreach (char sym in exp)
+            foreach (char sym in expression)
             {
                 if (sym == '(') countOpenBrack++;
                 if (sym == ')') countCloseBrack++;
@@ -53,49 +70,58 @@ namespace StrCalc
             else return true;
         }
 
-        public void ToReversePolishNotation()
+        private void ToReversePolishNotation()
         {
-            string str = null;
+            /*
+             * Функция преобразования математического выражения в форму Обратной Польской Записи - ОПЗ
+             * (Reverse Polish notation, RPN), при которой математическа операция записывается после
+             * двух предшествующих операднов
+             */
+
+            string str = null;  // Строковая переменная для сохранения чисел порядка 1 и более
             int stackCount;
 
-            for (int i = 0; i < exp.Length; i++)
+            for (int i = 0; i < expression.Length; i++)
             {
-                if (Char.IsDigit(exp[i])) str += exp[i];
-                else AddToOutputList(ref str);
+                if (Char.IsDigit(expression[i])) str += expression[i];  // Если число - добавить к строке
+                else AddToOutputList(ref str);                          // иначе - добавить в выходную строку
 
-                if (exp[i] == '(') stack.Push(exp[i]);
-                else if (exp[i] == ')')
+                if (expression[i] == '(') stack.Push(expression[i]);    // Если ( - добавить в стэк
+                else if (expression[i] == ')')                          // Если ) :
                 {
-                    while (stack.Peek() != '(') outputList.Add(Convert.ToString(stack.Pop()));
-                    if (stack.Peek() == '(') stack.Pop();
+                    while (stack.Peek() != '(') outputList.Add(Convert.ToString(stack.Pop()));  // Пока НЕ (, выталкивать из стэка в выходную строку
+                    if (stack.Peek() == '(') stack.Pop();                                           // Вытолкнуть (
                 }
-                else if (!Char.IsDigit(exp[i]))
+                else if (!Char.IsDigit(expression[i]))                  // Если операция
                 {
-                    if ((stack.Count > 0))
+                    if (stack.Count > 0)                                // пока стэк не пуст
                     {
                         stackCount = stack.Count;
                         for (int j = 0; j < stackCount; j++)
                         {
-                            if (IsNoLowerPriority(stack.Peek(), exp[i]))
+                            if (IsNoLowerPriority(stack.Peek(), expression[i])) // если приоритет в стэке не меньше приоритета операции в строке
                             {
-                                outputList.Add(Convert.ToString(stack.Pop()));
+                                outputList.Add(Convert.ToString(stack.Pop()));      // вытолкнуть из стэка в выходную строку
                             }
                         }
                     }
-                    stack.Push(exp[i]);
+                    stack.Push(expression[i]);                                          // Добавить текущий оператор в стэк
                 }
             }
 
-            AddToOutputList(ref str);
+            AddToOutputList(ref str);                                   // Добавить в выходную строку последнее число
             stackCount = stack.Count;
 
-            for (int i = 0; i < stackCount; i++) outputList.Add(Convert.ToString(stack.Pop()));
-
-            ShowOutputList();
+            for (int i = 0; i < stackCount; i++) outputList.Add(Convert.ToString(stack.Pop())); // Вытолкнуть оставшиеся операции в выходную строку
         }
 
-        public bool IsNoLowerPriority(char fromStack, char fromString)
+        private bool IsNoLowerPriority(char fromStack, char fromString)
         {
+            /*
+             * Функция, возвращающая true в случае, когда приоритет оперции в вершине
+             * стэка выше или равен приоритету опреции в строке, false в противном случае
+             */
+
             Dictionary<char, sbyte> priority = new Dictionary<char, sbyte>
             {
                 {'+', 1},
@@ -111,18 +137,53 @@ namespace StrCalc
             }
 
             return false;
-
-            //if (fromStack != '(')
-            //{
-            //    if ((fromStack == '+') && (fromString == '*')) return false;
-            //    else if ((fromStack == '*') && (fromString == '+')) return true;
-            //    else return true;
-            //}
-            //else return false;
         }
 
-        public void AddToOutputList(ref string str)
+        private int CalculateExpression()
         {
+            // Функция вычисления выражения в ОПЗ
+
+            string result;
+            string pattern = "[0-9]{1,}";
+            int i = 0;
+            while (outputList.Count > 1)
+            {
+                if (!Regex.IsMatch(outputList[i], pattern, RegexOptions.IgnoreCase))
+                {
+                    result = CalculateBinary(outputList[i], outputList[i - 2], outputList[i - 1]);
+                    outputList.Insert(i - 2, result);
+                    for (int j = 0; j < 3; j++) outputList.RemoveAt(i - 1);
+                    i = 0;
+                    continue;
+                }
+                i++;
+            }
+
+            return Convert.ToInt32(outputList[0]);
+        }
+
+        private string CalculateBinary(string mathOperator, string first, string second)
+        {
+            /*
+             * Функция бинарного вычисления в зависимости от поступающего символа
+             * математической операции
+             */
+
+            int intFirst = Convert.ToInt32(first);
+            int intSecond = Convert.ToInt32(second);
+
+            if (mathOperator == "+") return Convert.ToString(intFirst + intSecond);
+            if (mathOperator == "-") return Convert.ToString(intFirst - intSecond);
+            if (mathOperator == "*") return Convert.ToString(intFirst * intSecond);
+            if (mathOperator == "/") return Convert.ToString(intFirst / intSecond);
+
+            return null;
+        }
+
+        private void AddToOutputList(ref string str)
+        {
+            // Добавления числа к выходной строке
+
             if (str != null)
             {
                 outputList.Add(str);
@@ -130,10 +191,21 @@ namespace StrCalc
             }
         }
 
-        public void ShowOutputList()
+        private void ShowOutputList()
         {
+            // Выводит математическое выражение в ОПЗ
+
             Console.WriteLine("Строка:");
             foreach (var sym in outputList) Console.Write("{0} ", sym);
+        }
+
+        public int GetResult()
+        {
+            // Общая функция
+
+            GetExpression();
+            ToReversePolishNotation();
+            return CalculateExpression();
         }
     }
 
@@ -141,10 +213,15 @@ namespace StrCalc
     {
         static void Main(string[] args)
         {
-            Calculator obj = new Calculator();
-            obj.GetExpression();
-            obj.ToReversePolishNotation();
-            
+            string expression;
+
+            Console.Write("Enter your expression: ");
+            expression = Console.ReadLine();
+
+            Calculator obj = new Calculator(expression);
+
+            Console.Write("Answer: ");
+            Console.WriteLine(obj.GetResult());
         }
     }
 }
