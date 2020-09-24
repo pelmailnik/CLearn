@@ -1,2 +1,4 @@
-﻿/StrCalc/.vs
-**/.vs
+﻿**/.vs
+**/obj
+**/bin
+
