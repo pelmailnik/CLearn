@@ -1,0 +1,26 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Home page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome to StrCalc.Web</h1>
+    <p>Введите выражение:</p>
+    <form name="test" method="post">
+        <input name="exp" type="text" size="40" placeholder=" Например: 2 - ((2 + 2) * 2)">
+        <p>
+            <input type="submit" value="Вычислить">
+            <input type="reset" value="Очистить">
+        </p>
+    </form>
+    <p></p>
+</div>
+
+@{
+    if (!String.IsNullOrEmpty(@Model.expressoin))
+    {
+        <br /><p>Значение выражения: @Model.expressoin</p>
+        <br />
+    }
+}
