@@ -1,0 +1,36 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v3.1",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v3.1": {
+      "StrCalc.Terminal/1.0.0": {
+        "dependencies": {
+          "StrCalc": "1.0.0"
+        },
+        "runtime": {
+          "StrCalc.Terminal.dll": {}
+        }
+      },
+      "StrCalc/1.0.0": {
+        "runtime": {
+          "StrCalc.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "StrCalc.Terminal/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "StrCalc/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
