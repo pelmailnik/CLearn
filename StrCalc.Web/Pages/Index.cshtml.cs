@@ -11,21 +11,22 @@ namespace StrCalc.Web.Pages
     public class IndexModel : PageModel
     {
         private readonly ILogger<IndexModel> _logger;
+        private readonly ICalculator _calculator;
+
         public string expressoin { get; set; }
 
-        public IndexModel(ILogger<IndexModel> logger)
+        public IndexModel(ILogger<IndexModel> logger, ICalculator calculator)
         {
             _logger = logger;
+            _calculator = calculator;
         }
 
         public void OnPost(string exp)
         {
-            var expressionValidator = new ExpressionValidator();
-            ICalculator obj = new Calculator(expressionValidator);
 
             if (!String.IsNullOrEmpty(exp))
             {
-                expressoin = obj.Calculate(exp).ToString();
+                expressoin = _calculator.Calculate(exp).ToString();
             }
         }
     }
