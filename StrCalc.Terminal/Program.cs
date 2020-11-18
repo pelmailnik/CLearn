@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 
 namespace StrCalc.Terminal
 {
@@ -6,8 +7,12 @@ namespace StrCalc.Terminal
     {
         static void Main(string[] args)
         {
-            var expressionValidator = new ExpressionValidator();
-            ICalculator obj = new Calculator(expressionValidator);
+            IServiceCollection services = new ServiceCollection();
+            services.AddCalculator();
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            ICalculator obj = serviceProvider.GetRequiredService<ICalculator>();
 
             while (true)
             {

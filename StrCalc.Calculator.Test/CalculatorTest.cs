@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Extensions.DependencyInjection;
+using System;
 using Xunit;
 
 namespace StrCalc.Test
@@ -15,10 +16,15 @@ namespace StrCalc.Test
         [InlineData("-4-(-5)", 1)]
         [InlineData("(-4)-(-5)", 1)]
         [InlineData("(-4-5)", -9)]
+        [InlineData("(-4)+(-5)", -9)]
         public void CalculatorWorksOk(string expression, int expectedVal)
         {
-            var expressionValidator = new ExpressionValidator();
-            var calc = new Calculator(expressionValidator);
+            IServiceCollection services = new ServiceCollection();
+            services.AddCalculator();
+
+            var serviceProvider = services.BuildServiceProvider();
+
+            ICalculator calc = serviceProvider.GetRequiredService<ICalculator>();
 
             var result = calc.Calculate(expression);
 
