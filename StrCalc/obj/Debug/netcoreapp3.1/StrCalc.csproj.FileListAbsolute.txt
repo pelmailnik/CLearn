@@ -1,9 +1,0 @@
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\bin\Debug\netcoreapp3.1\StrCalc.deps.json
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\bin\Debug\netcoreapp3.1\StrCalc.dll
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\bin\Debug\netcoreapp3.1\StrCalc.pdb
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\obj\Debug\netcoreapp3.1\StrCalc.AssemblyInfoInputs.cache
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\obj\Debug\netcoreapp3.1\StrCalc.AssemblyInfo.cs
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\obj\Debug\netcoreapp3.1\StrCalc.csproj.CoreCompileInputs.cache
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\obj\Debug\netcoreapp3.1\StrCalc.dll
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\obj\Debug\netcoreapp3.1\StrCalc.pdb
-D:\Users\pelmailnik\Documents\GitHub\CSLearn\StrCalc\obj\Debug\netcoreapp3.1\StrCalc.csprojAssemblyReference.cache
