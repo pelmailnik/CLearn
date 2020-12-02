@@ -8,7 +8,7 @@ namespace StrCalc
     {
         private ExpressionTree<T> _parent, _left, _right, _position;
         private T _val = default;
-        private int _commandPriority;
+        private int _commandPriority = 0;
 
         public ExpressionTree(ExpressionTree<T> parent = null)
         {
@@ -16,21 +16,16 @@ namespace StrCalc
             _position = this;
         }
 
-        public void Add(T val, T left, T right)
-        {
-            _position._left._val = left;
-            _position._right._val = right;
-        }
-
         public void SetValue(T val)
         {
             _position._val = val;
         }
 
-        public void ToLeft()
+        public void ToLeft(T val)
         {
             _position._left = new ExpressionTree<T>(_position);
             _position = _position._left;
+            SetValue(val);
         }
 
         public void ToRight()
@@ -39,14 +34,23 @@ namespace StrCalc
             _position = _position._right;
         }
 
+        public void ToRight(T right)
+        {
+            _position._right = new ExpressionTree<T>(_position);
+            _position = _position._right;
+            SetValue(right);
+        }
+
         public void PositionUp()
         {
-            if (_position._parent == null)
-            {
-                ExpressionTree<T> tmp = new ExpressionTree<T>();
-                _position._parent = tmp;
-                tmp._left = _position;
-            }
+            _position = _position._parent;
+        }
+
+        public void NewParent()
+        {
+            var tmp = new ExpressionTree<T>();
+            _position._parent = tmp;
+            tmp._left = _position;
             _position = _position._parent;
         }
 
@@ -55,19 +59,24 @@ namespace StrCalc
             _position._commandPriority = priority;
         }
 
-        public void AddCommandAndLeft(T val, T left, int priority)
+        public bool IsHigherPriorityThanParent(int priority)
         {
-            SetValue(val);
-            SetPriority(priority);
-            ToLeft();
-            SetValue(left);
-            PositionUp();
-            ToRight();
+            if (_position._parent != null)
+            {
+                return priority >= _position._parent._commandPriority;
+            }
+
+            return true;
         }
 
-        public void AddRight(T right)
+        public bool IsParentExists()
         {
-            SetValue(right);
+            return _position._parent != null;
+        }
+
+        public ExpressionTree<T> GetHead()
+        {
+            return _position;
         }
     }
 }

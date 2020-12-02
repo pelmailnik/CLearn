@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace StrCalc
 {
@@ -7,7 +8,7 @@ namespace StrCalc
     {
         private readonly IExpressionValidator _expressionValidator;
         private readonly List<CommandInfo> _supportedCommands;
-        private ExpressionTree<string> tree;
+        private ExpressionTree<string> _tree;
 
         public AdvancedCalculationEngine(IExpressionValidator expressionValidator)
         {
@@ -17,9 +18,7 @@ namespace StrCalc
 
         public CalculationResult Calculate(string expression)
         {
-            CalculationResult temporary = new CalculationResult();
-
-            //expression = ToProcessString(expression);
+            var temporary = new CalculationResult();
 
             if (_expressionValidator.IsCorrect(expression))
             {
@@ -37,32 +36,64 @@ namespace StrCalc
 
         private void ToTree(string expression)
         {
-            tree = new ExpressionTree<string>();
-            int coefOfPriority = 0;
-            int counter = 0;
-            string pattern = "^[0-9]+$";
+            const int buf = 100;
+            _tree = new ExpressionTree<string>();
+            var factorOfPriority = 0;
+            string str = null;
 
-            while (expression.Length > 0)
+            foreach (var symbol in expression)
             {
-                foreach (CommandInfo command in _supportedCommands)
+                switch (symbol)
                 {
-                    if (command.Symbol == expression[counter])
+                    case '(':
+                        factorOfPriority += buf;
+                        continue;
+                    case ')':
+                        factorOfPriority -= buf;
+                        if (!string.IsNullOrEmpty(str))
+                        {
+                            _tree.PositionUp();
+                            _tree.ToRight(str);
+                        }
+                        str = null;
+                        continue;
+                }
+
+                if (char.IsDigit(symbol))
+                {
+                    str += symbol;
+                    continue;
+                }
+
+                foreach (var command in _supportedCommands.Where(command => command.Symbol == symbol))
+                {
+                    if (_tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
                     {
-                        string tmp = System.Convert.ToString(expression[counter]);
-                        tree.AddCommandAndLeft(tmp, expression.Substring(0, counter), command.Priority + coefOfPriority);
-                        expression = expression.Substring(counter + 1);
-                        counter = 0;
+                        _tree.SetValue(Convert.ToString(symbol));
+                        _tree.SetPriority(command.Priority + factorOfPriority);
+                        _tree.ToLeft(str);
+                        _tree.PositionUp();
+                        _tree.ToRight();
+                        str = null;
+                    }
+                    else
+                    {
+                        while (_tree.IsParentExists())
+                        {
+                            _tree.PositionUp();
+                        }
+                        _tree.NewParent();
+                        _tree = _tree.GetHead();
+                        _tree.SetValue(Convert.ToString(symbol));
+                        _tree.SetPriority(command.Priority + factorOfPriority);
+                        _tree.ToRight();
                     }
                 }
-
-                if (Regex.IsMatch(expression, pattern, RegexOptions.IgnoreCase))
-                {
-                    tree.AddRight(expression);
-                    break;
-                }
-
-                counter++;
             }
+
+            if (string.IsNullOrEmpty(str)) return;
+            _tree.PositionUp();
+            _tree.ToRight(str);
         }
 
         private string CalculateTree()
@@ -73,12 +104,12 @@ namespace StrCalc
             return result;
         }
 
-        private List<CommandInfo> BuildSupportedCommands()
+        private static List<CommandInfo> BuildSupportedCommands()
         {
             return new List<CommandInfo>
             {
-                new CommandInfo(0, '+', true),
-                new CommandInfo(0, '-', true),
+                new CommandInfo(1, '+', true),
+                new CommandInfo(1, '-', true),
                 new CommandInfo(5, '*', true),
                 new CommandInfo(5, '/', true),
                 new CommandInfo(10, '!', false),
