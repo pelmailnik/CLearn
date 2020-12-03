@@ -1,10 +1,10 @@
 ﻿namespace StrCalc
 {
-    class Addition : IMathematicalOperation
+    class Division : IMathematicalOperation
     {
         public int Compute(int first, int second)
         {
-            return first + second;
+            return first / second;
         }
     }
 }

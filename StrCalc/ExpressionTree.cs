@@ -1,44 +1,67 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace StrCalc
 {
-    class ExpressionTree<T> where T : IComparable<T>
+    internal class ExpressionTree
     {
-        private ExpressionTree<T> _parent, _left, _right, _position;
-        private T _val = default;
-        private int _commandPriority = 0;
+        private ExpressionTree _parent, _left, _right, _position, _head;
+        private int _val = default;
+        private CommandInfo _command;
 
-        public ExpressionTree(ExpressionTree<T> parent = null)
+        public ExpressionTree(ExpressionTree parent = null)
         {
             _parent = parent;
             _position = this;
+            _head = this;
         }
 
-        public void SetValue(T val)
+        public void SetValue(string val)
         {
-            _position._val = val;
+            _position._val = Convert.ToInt32(val);
         }
 
-        public void ToLeft(T val)
+        public int GetValue()
         {
-            _position._left = new ExpressionTree<T>(_position);
+            return _position._val;
+        }
+
+        public void SetCommand(CommandInfo command, int buf)
+        {
+            _position._command = new CommandInfo(
+                command.Priority + buf,
+                command.Symbol,
+                command.IsBinary,
+                command.MathematicalOperation
+                );
+        }
+
+        public void NewLeft(string val)
+        {
+            _position._left = new ExpressionTree(_position);
             _position = _position._left;
             SetValue(val);
         }
 
-        public void ToRight()
+        public void NewRight()
         {
-            _position._right = new ExpressionTree<T>(_position);
+            _position._right = new ExpressionTree(_position);
             _position = _position._right;
         }
 
-        public void ToRight(T right)
+        public void NewRight(string right)
         {
-            _position._right = new ExpressionTree<T>(_position);
+            _position._right = new ExpressionTree(_position);
             _position = _position._right;
             SetValue(right);
+        }
+
+        public void NewParent()
+        {
+            var tmp = new ExpressionTree();
+            _position._parent = tmp;
+            tmp._left = _position;
+            _position = _position._parent;
+            _head = _position;
         }
 
         public void PositionUp()
@@ -46,24 +69,39 @@ namespace StrCalc
             _position = _position._parent;
         }
 
-        public void NewParent()
+        public void ToLeft()
         {
-            var tmp = new ExpressionTree<T>();
-            _position._parent = tmp;
-            tmp._left = _position;
-            _position = _position._parent;
+            _position = _position._left;
         }
 
-        public void SetPriority(int priority)
+        public void ToRight()
         {
-            _position._commandPriority = priority;
+            _position = _position._right;
+        }
+
+        public ExpressionTree GetLeft()
+        {
+            return _position._left;
+        }
+
+        public ExpressionTree GetRight()
+        {
+            return _position._right;
+        }
+
+        public void TreeCompute(ExpressionTree left, ExpressionTree right)
+        {
+            _position._val = _position._command.Compute(left._val, right._val);
+            _position._left = null;
+            _position._right = null;
+            _position._command = null;
         }
 
         public bool IsHigherPriorityThanParent(int priority)
         {
             if (_position._parent != null)
             {
-                return priority >= _position._parent._commandPriority;
+                return priority > _position._parent._command.Priority;
             }
 
             return true;
@@ -74,9 +112,29 @@ namespace StrCalc
             return _position._parent != null;
         }
 
-        public ExpressionTree<T> GetHead()
+        public bool InLeftCommand()
         {
-            return _position;
+            return _position._left._command != null;
+        }
+
+        public bool InRightCommand()
+        {
+            return _position._right._command != null;
+        }
+
+        public bool IsTreeExists()
+        {
+            return (_head._left != null) & (_head._right != null);
+        }
+
+        public ExpressionTree GetHead()
+        {
+            return _head;
+        }
+
+        public void ResetPosition()
+        {
+            _position = _head;
         }
     }
 }

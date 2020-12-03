@@ -7,6 +7,8 @@ namespace StrCalc.Test
     public class CalculatorTest
     {
         [Theory]
+        [InlineData("1 + 2 + 3 + 4", 10)]
+        [InlineData("1 - 2 + 3 - 4", -2)]
         [InlineData("(2 + 2) - 4", 0)]
         [InlineData("(2 + (2 /2)) - 4", -1)]
         [InlineData("(2 + 2) - 4 /2", 2)]
@@ -17,6 +19,8 @@ namespace StrCalc.Test
         [InlineData("(-4)-(-5)", 1)]
         [InlineData("(-4-5)", -9)]
         [InlineData("(-4)+(-5)", -9)]
+        [InlineData("(2 + (2 *2)) - 4", 2)]
+        [InlineData("(2 + 2) - 4 *2", -4)]
         public void CalculatorWorksOk(string expression, int expectedVal)
         {
             IServiceCollection services = new ServiceCollection();

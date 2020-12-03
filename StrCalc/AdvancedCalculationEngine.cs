@@ -8,11 +8,11 @@ namespace StrCalc
     {
         private readonly IExpressionValidator _expressionValidator;
         private readonly List<CommandInfo> _supportedCommands;
-        private ExpressionTree<string> _tree;
+        private ExpressionTree _tree;
 
         public AdvancedCalculationEngine(IExpressionValidator expressionValidator)
         {
-            _supportedCommands = BuildSupportedCommands();
+            _supportedCommands = Operations.BuildSupportedCommands();
             _expressionValidator = expressionValidator;
         }
 
@@ -37,7 +37,7 @@ namespace StrCalc
         private void ToTree(string expression)
         {
             const int buf = 100;
-            _tree = new ExpressionTree<string>();
+            _tree = new ExpressionTree();
             var factorOfPriority = 0;
             string str = null;
 
@@ -52,10 +52,8 @@ namespace StrCalc
                         factorOfPriority -= buf;
                         if (!string.IsNullOrEmpty(str))
                         {
-                            _tree.PositionUp();
-                            _tree.ToRight(str);
+                            _tree.SetValue(str);
                         }
-                        str = null;
                         continue;
                 }
 
@@ -69,51 +67,62 @@ namespace StrCalc
                 {
                     if (_tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
                     {
-                        _tree.SetValue(Convert.ToString(symbol));
-                        _tree.SetPriority(command.Priority + factorOfPriority);
-                        _tree.ToLeft(str);
+                        _tree.SetCommand(command, factorOfPriority);
+                        _tree.NewLeft(str);
                         _tree.PositionUp();
-                        _tree.ToRight();
+                        _tree.NewRight();
                         str = null;
                     }
                     else
                     {
+                        _tree.SetValue(str);
                         while (_tree.IsParentExists())
                         {
                             _tree.PositionUp();
                         }
                         _tree.NewParent();
                         _tree = _tree.GetHead();
-                        _tree.SetValue(Convert.ToString(symbol));
-                        _tree.SetPriority(command.Priority + factorOfPriority);
-                        _tree.ToRight();
+                        _tree.SetCommand(command, factorOfPriority);
+                        _tree.NewRight();
+                        str = null;
                     }
                 }
             }
 
-            if (string.IsNullOrEmpty(str)) return;
-            _tree.PositionUp();
-            _tree.ToRight(str);
+            if (!string.IsNullOrEmpty(str))
+            {
+                _tree.SetValue(str);
+            }
+  
+            _tree.ResetPosition();
         }
 
         private string CalculateTree()
         {
-            string result = null;
-
-
-            return result;
-        }
-
-        private static List<CommandInfo> BuildSupportedCommands()
-        {
-            return new List<CommandInfo>
+            while (_tree.IsTreeExists())
             {
-                new CommandInfo(1, '+', true),
-                new CommandInfo(1, '-', true),
-                new CommandInfo(5, '*', true),
-                new CommandInfo(5, '/', true),
-                new CommandInfo(10, '!', false),
-            };
+                if (_tree.InLeftCommand())
+                {
+                    _tree.ToLeft();
+                }
+                else if (_tree.InRightCommand())
+                {
+                    _tree.ToRight();
+                }
+                else
+                {
+                    _tree.TreeCompute(_tree.GetLeft(), _tree.GetRight());
+                    if (_tree.IsParentExists())
+                    {
+                        _tree.PositionUp();
+                    }
+                }
+            }
+
+            
+            return Convert.ToString(_tree.GetValue());
         }
+
+        
     }
 }
