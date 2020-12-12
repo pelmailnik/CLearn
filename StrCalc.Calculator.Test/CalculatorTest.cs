@@ -6,6 +6,11 @@ namespace StrCalc.Test
 {
     public class CalculatorTest
     {
+        protected IServiceCollection Services;
+        protected ServiceProvider ServiceProvider;
+        protected ICalculator Calc;
+        //protected CalculationResult Result;
+
         [Theory]
         [InlineData("1 + 2 + 3 + 4", 10)]
         [InlineData("1 - 2 + 3 - 4", -2)]
@@ -21,16 +26,24 @@ namespace StrCalc.Test
         [InlineData("(-4)+(-5)", -9)]
         [InlineData("(2 + (2 *2)) - 4", 2)]
         [InlineData("(2 + 2) - 4 *2", -4)]
+        [InlineData("2 + 2!", 4)]
+        [InlineData("(2 + 2) - 4!", -20)]
+        [InlineData("(1 + 2) + 3!", 9)]
+        [InlineData("1 + (2 + 3)!", 121)]
+        [InlineData("1 + ((2 + 3)!) - 100", 21)]
+        [InlineData("(1 + (2 + 3))! - 100", 620)]
+        [InlineData("(1 + 2)! - 3", 3)]
+
         public void CalculatorWorksOk(string expression, int expectedVal)
         {
-            IServiceCollection services = new ServiceCollection();
-            services.AddCalculator();
+            Services = new ServiceCollection();
+            Services.AddCalculator();
 
-            var serviceProvider = services.BuildServiceProvider();
+            ServiceProvider = Services.BuildServiceProvider();
 
-            ICalculator calc = serviceProvider.GetRequiredService<ICalculator>();
+            Calc = ServiceProvider.GetRequiredService<ICalculator>();
 
-            var result = calc.Calculate(expression);
+            var result = Calc.Calculate(expression);
 
             Assert.Equal(Convert.ToString(expectedVal), Convert.ToString(result));
         }

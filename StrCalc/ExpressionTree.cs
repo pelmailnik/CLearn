@@ -5,7 +5,7 @@ namespace StrCalc
     internal class ExpressionTree
     {
         private ExpressionTree _parent, _left, _right, _position, _head;
-        private int _val = default;
+        private int _val;
         private CommandInfo _command;
 
         public ExpressionTree(ExpressionTree parent = null)
@@ -38,30 +38,46 @@ namespace StrCalc
         public void NewLeft(string val)
         {
             _position._left = new ExpressionTree(_position);
-            _position = _position._left;
-            SetValue(val);
+            _position._left.SetValue(val);
         }
 
         public void NewRight()
         {
             _position._right = new ExpressionTree(_position);
-            _position = _position._right;
         }
 
-        public void NewRight(string right)
+        public void NewRight(string val)
         {
             _position._right = new ExpressionTree(_position);
-            _position = _position._right;
-            SetValue(right);
+            _position._right.SetValue(val);
         }
 
-        public void NewParent()
+        public void NewHead()
         {
             var tmp = new ExpressionTree();
             _position._parent = tmp;
             tmp._left = _position;
-            _position = _position._parent;
-            _head = _position;
+            _head = tmp;
+        }
+
+        public void AddNode()
+        {
+            try
+            {
+                var tmp = new ExpressionTree { _parent = _position, _left = _position._right };
+
+                _position._right._parent = tmp;
+                _position._right = tmp;
+            }
+            catch (NullReferenceException)
+            {
+                NewHead();
+            }
+        }
+
+        public void DeleteValue()
+        {
+            _position._val = 0;
         }
 
         public void PositionUp()
@@ -89,9 +105,15 @@ namespace StrCalc
             return _position._right;
         }
 
+        public ExpressionTree GetParent()
+        {
+            return _position._parent;
+        }
+
         public void TreeCompute(ExpressionTree left, ExpressionTree right)
         {
-            _position._val = _position._command.Compute(left._val, right._val);
+            _position._val = right != null ? _position._command.Compute(left._val, right._val) : _position._command.Compute(left._val);
+            
             _position._left = null;
             _position._right = null;
             _position._command = null;
@@ -99,14 +121,9 @@ namespace StrCalc
 
         public bool IsHigherPriorityThanParent(int priority)
         {
-            if (_position._parent != null)
-            {
-                return priority > _position._parent._command.Priority;
-            }
-
-            return true;
+            return priority > _position._parent._command.Priority;
         }
-
+        
         public bool IsParentExists()
         {
             return _position._parent != null;
@@ -119,7 +136,15 @@ namespace StrCalc
 
         public bool InRightCommand()
         {
-            return _position._right._command != null;
+            //return _position._right._command != null;
+            try
+            {
+                return _position._right._command != null;
+            }
+            catch (NullReferenceException)
+            {
+                return false;
+            }
         }
 
         public bool IsTreeExists()

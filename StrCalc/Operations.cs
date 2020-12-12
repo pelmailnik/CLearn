@@ -12,7 +12,7 @@ namespace StrCalc
                 new CommandInfo(1, '-', true, new Substraction()),
                 new CommandInfo(5, '*', true, new Multiplication()),
                 new CommandInfo(5, '/', true, new Division()),
-                //new CommandInfo(10, '!', false),
+                new CommandInfo(10, '!', false, new Factorial()),
             };
         }
     }

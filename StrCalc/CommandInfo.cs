@@ -19,5 +19,10 @@
         {
             return MathematicalOperation.Compute(first, second);
         }
+
+        public int Compute(int first)
+        {
+            return MathematicalOperation.Compute(first);
+        }
     }
 }

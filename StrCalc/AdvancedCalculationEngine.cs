@@ -65,26 +65,84 @@ namespace StrCalc
 
                 foreach (var command in _supportedCommands.Where(command => command.Symbol == symbol))
                 {
-                    if (_tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
+                    if (command.IsBinary)
                     {
-                        _tree.SetCommand(command, factorOfPriority);
-                        _tree.NewLeft(str);
-                        _tree.PositionUp();
-                        _tree.NewRight();
-                        str = null;
+                        if (_tree.IsParentExists() && _tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
+                        {
+                            _tree.SetCommand(command, factorOfPriority);
+                            _tree.NewLeft(str);
+                            _tree.NewRight();
+                            _tree.ToRight();
+                            str = null;
+                        }
+                        else
+                        {
+                            _tree.SetValue(str);
+                            while (_tree.IsParentExists())
+                            {
+                                _tree.PositionUp();
+                            }
+                            _tree.NewHead();
+                            _tree.PositionUp();
+                            _tree = _tree.GetHead();
+                            _tree.SetCommand(command, factorOfPriority);
+                            _tree.NewRight();
+                            _tree.ToRight();
+                            str = null;
+                        }
                     }
                     else
                     {
                         _tree.SetValue(str);
-                        while (_tree.IsParentExists())
+
+                        if (_tree.IsParentExists() && _tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
                         {
                             _tree.PositionUp();
+                            _tree.AddNode();
+                            _tree.ToRight();
+                            _tree.SetCommand(command, factorOfPriority);
+                            str = null;
                         }
-                        _tree.NewParent();
-                        _tree = _tree.GetHead();
-                        _tree.SetCommand(command, factorOfPriority);
-                        _tree.NewRight();
-                        str = null;
+                        else
+                        {
+                            while (_tree.IsParentExists() && !_tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
+                            {
+                                _tree.PositionUp();
+                            }
+                            //_tree.PositionUp();
+                            _tree.NewHead();
+                            _tree.PositionUp();
+                            _tree = _tree.GetHead();
+                            _tree.SetCommand(command, factorOfPriority);
+                            _tree.ToLeft();
+
+
+                            //while (_tree.IsParentExists() && !_tree.IsHigherPriorityThanParent(command.Priority + factorOfPriority))
+                            //{
+                            //    _tree.PositionUp();
+                            //}
+
+                            //if (_tree.IsParentExists())
+                            //{
+                            //    _tree.PositionUp();
+                            //}
+                            //else
+                            //{
+                            //    _tree.NewHead();
+                            //    //_tree.ToLeft();
+                            //}
+
+
+                            ////_tree.PositionUp();
+                            //_tree.AddNode();
+                            //_tree.ToRight();
+                            ////_tree.PositionUp();
+                            //_tree.SetCommand(command, factorOfPriority);
+                            ////_tree.NewHead();
+                            //str = null;
+                        }
+
+                        
                     }
                 }
             }
@@ -119,10 +177,7 @@ namespace StrCalc
                 }
             }
 
-            
             return Convert.ToString(_tree.GetValue());
         }
-
-        
     }
 }

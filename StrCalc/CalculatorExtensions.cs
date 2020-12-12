@@ -12,7 +12,7 @@ namespace StrCalc
             services
                 .AddScoped<ICalculator, Calculator>()
                 .AddScoped<ICalculationEngine, AdvancedCalculationEngine>()
-                .AddScoped<IExpressionValidator, ExpressionValidator>();
+                .AddScoped<IExpressionValidator, AdvancedExpressionValidator>();
 
             return services;
         }
